@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.TestimonioDTO;
 import pe.edu.upc.reportandbeheard.dtos.TestimonioResponseDTO;
+import pe.edu.upc.reportandbeheard.dtos.TestimonioUpdateRequest;
 import pe.edu.upc.reportandbeheard.entities.Categoria;
 import pe.edu.upc.reportandbeheard.entities.Testimonio;
 import pe.edu.upc.reportandbeheard.entities.Usuario;
@@ -120,7 +121,7 @@ public class TestimonioController {
     public ResponseEntity<TestimonioResponseDTO> buscarPorId(
             @Parameter(description = "Identificador del testimonio", required = true)
             @PathVariable Long id) {
-        Testimonio testimonio = tS.listId(id)
+        Testimonio testimonio = tS.obtenerPorId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No existe un testimonio con el id: " + id));
 
         TestimonioResponseDTO dto = modelMapper.map(testimonio, TestimonioResponseDTO.class);
@@ -130,11 +131,13 @@ public class TestimonioController {
         return ResponseEntity.ok(dto);
     }
 
-    @PutMapping
-    public ResponseEntity<TestimonioDTO> actualizar(@Valid @RequestBody TestimonioDTO dto) {
-        Optional<Testimonio> existente = tS.listId(dto.getIdTestimonio());
+    @PutMapping("/{id}")
+    public ResponseEntity<TestimonioResponseDTO> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody TestimonioUpdateRequest dto) {
+        Optional<Testimonio> existente = tS.obtenerPorId(id);
         if (existente.isEmpty()) {
-            throw new ResourceNotFoundException("No existe un testimonio con el id: " + dto.getIdTestimonio());
+            throw new ResourceNotFoundException("No existe un testimonio con el id: " + id);
         }
 
         Testimonio testimonio = existente.get();
@@ -156,9 +159,9 @@ public class TestimonioController {
         testimonio.setEstado(dto.getEstado());
         testimonio.setFechaActualizacion(LocalDateTime.now());
 
-        tS.update(testimonio);
+        tS.actualizar(testimonio);
 
-        TestimonioDTO response = modelMapper.map(testimonio, TestimonioDTO.class);
+        TestimonioResponseDTO response = modelMapper.map(testimonio, TestimonioResponseDTO.class);
         response.setIdUsuario(usuario.getIdUsuario());
         response.setIdCategoria(categoria.getIdCategoria());
         response.setIdZona(zona.getIdZona());
@@ -167,10 +170,7 @@ public class TestimonioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        Testimonio testimonio = tS.listId(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No existe un testimonio con el id: " + id));
-
-        tS.delete(testimonio.getIdTestimonio());
+        tS.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 }

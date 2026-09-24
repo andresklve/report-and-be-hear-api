@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface ITestimonioService {
     void insert(Testimonio testimonio);
     List<Testimonio> list();
-    void update(Testimonio testimonio);
-    void delete(Long idTestimonio);
-    Optional<Testimonio> listId(Long id);
+    void actualizar(Testimonio testimonio);
+    void eliminar(Long idTestimonio);
+    Optional<Testimonio> obtenerPorId(Long id);
 }
