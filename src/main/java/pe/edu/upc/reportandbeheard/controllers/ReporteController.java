@@ -7,20 +7,28 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pe.edu.upc.reportandbeheard.dtos.InversionDepartamentoDTO;
+import pe.edu.upc.reportandbeheard.dtos.CategoriaReporteDTO;
 import pe.edu.upc.reportandbeheard.dtos.CostoCategoriaDTO;
+import pe.edu.upc.reportandbeheard.dtos.InversionDepartamentoDTO;
+import pe.edu.upc.reportandbeheard.dtos.MapaCalorDTO;
+import pe.edu.upc.reportandbeheard.dtos.RankingZonaDTO;
+import pe.edu.upc.reportandbeheard.dtos.TendenciaTemporalDTO;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IModeracionService;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.IReporteService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/apis/reportes")
-@Tag(name = "Reportes", description = "Reportes de inversión del sistema")
+@Tag(name = "Reportes", description = "Reportes del sistema (inversión, mapa de calor, categorías, tendencia y ranking)")
 public class ReporteController {
+    private final IReporteService rS;
     private final IModeracionService moderacionService;
 
-    public ReporteController(IModeracionService moderacionService) {
+    public ReporteController(IReporteService rS, IModeracionService moderacionService) {
+        this.rS = rS;
         this.moderacionService = moderacionService;
     }
 
@@ -46,5 +54,30 @@ public class ReporteController {
     @GetMapping("/costo-por-categoria")
     public ResponseEntity<List<CostoCategoriaDTO>> obtenerCostoPorCategoria() {
         return ResponseEntity.ok(moderacionService.obtenerCostoPorCategoria());
+    }
+
+    // US07: sin testimonios devuelve lista vacia con 200.
+    @GetMapping("/mapa-calor")
+    public ResponseEntity<List<MapaCalorDTO>> mapaCalor() {
+        return ResponseEntity.ok(rS.mapaCalorPorZona());
+    }
+
+    // US08: sin testimonios devuelve cada categoria con conteo 0 (200).
+    @GetMapping("/por-categoria")
+    public ResponseEntity<List<CategoriaReporteDTO>> porCategoria() {
+        return ResponseEntity.ok(rS.reportePorCategoria());
+    }
+
+    // US09: agrupacion "dia" (por defecto) o "mes".
+    @GetMapping("/tendencia")
+    public ResponseEntity<List<TendenciaTemporalDTO>> tendenciaTemporal(
+            @RequestParam(defaultValue = "dia") String agrupacion) {
+        return ResponseEntity.ok(rS.tendenciaTemporal(agrupacion));
+    }
+
+    // US10: zonas ordenadas por cantidad de testimonios.
+    @GetMapping("/ranking-zonas")
+    public ResponseEntity<List<RankingZonaDTO>> rankingZonas() {
+        return ResponseEntity.ok(rS.rankingZonas());
     }
 }

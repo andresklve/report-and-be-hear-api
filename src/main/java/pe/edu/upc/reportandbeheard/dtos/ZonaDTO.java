@@ -3,8 +3,6 @@ package pe.edu.upc.reportandbeheard.dtos;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
-
 public class ZonaDTO {
     private Long idZona;
 
@@ -18,10 +16,10 @@ public class ZonaDTO {
     private String departamentoZona;
 
     @NotNull(message = "La latitud es obligatoria.")
-    private BigDecimal latitudZona;
+    private Double latitudZona;
 
     @NotNull(message = "La longitud es obligatoria.")
-    private BigDecimal longitudZona;
+    private Double longitudZona;
 
     public Long getIdZona() {
         return idZona;
@@ -55,19 +53,19 @@ public class ZonaDTO {
         this.departamentoZona = departamentoZona;
     }
 
-    public BigDecimal getLatitudZona() {
+    public Double getLatitudZona() {
         return latitudZona;
     }
 
-    public void setLatitudZona(BigDecimal latitudZona) {
+    public void setLatitudZona(Double latitudZona) {
         this.latitudZona = latitudZona;
     }
 
-    public BigDecimal getLongitudZona() {
+    public Double getLongitudZona() {
         return longitudZona;
     }
 
-    public void setLongitudZona(BigDecimal longitudZona) {
+    public void setLongitudZona(Double longitudZona) {
         this.longitudZona = longitudZona;
     }
 }

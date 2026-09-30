@@ -2,44 +2,36 @@ package pe.edu.upc.reportandbeheard.entities;
 
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "zonas")
 public class Zona {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_zona")
     private Long idZona;
 
-    @Column(name = "nombre_zona", length = 100, nullable = false)
+    @Column(name = "nombreZona", length = 100, nullable = false)
     private String nombreZona;
 
-    @Column(name = "provincia", length = 100, nullable = false)
+    @Column(name = "provinciaZona", length = 100, nullable = false)
     private String provinciaZona;
 
-    @Column(name = "departamento", length = 100, nullable = false)
+    @Column(name = "departamentoZona", length = 100, nullable = false)
     private String departamentoZona;
 
-    @Column(name = "nivel_atencion", length = 20)
-    private String nivelAtencion;
+    @Column(name = "latitudZona", nullable = false)
+    private double latitudZona;
 
-    @Column(name = "latitud", precision = 9, scale = 6)
-    private BigDecimal latitudZona;
-
-    @Column(name = "longitud", precision = 9, scale = 6)
-    private BigDecimal longitudZona;
+    @Column(name = "longitudZona", nullable = false)
+    private double longitudZona;
 
     public Zona() {
     }
 
-    public Zona(Long idZona, String nombreZona, String provinciaZona, String departamentoZona,
-               String nivelAtencion, BigDecimal latitudZona, BigDecimal longitudZona) {
+    public Zona(Long idZona, String nombreZona, String provinciaZona, String departamentoZona, double latitudZona, double longitudZona) {
         this.idZona = idZona;
         this.nombreZona = nombreZona;
         this.provinciaZona = provinciaZona;
         this.departamentoZona = departamentoZona;
-        this.nivelAtencion = nivelAtencion;
         this.latitudZona = latitudZona;
         this.longitudZona = longitudZona;
     }
@@ -76,27 +68,19 @@ public class Zona {
         this.departamentoZona = departamentoZona;
     }
 
-    public String getNivelAtencion() {
-        return nivelAtencion;
-    }
-
-    public void setNivelAtencion(String nivelAtencion) {
-        this.nivelAtencion = nivelAtencion;
-    }
-
-    public BigDecimal getLatitudZona() {
+    public double getLatitudZona() {
         return latitudZona;
     }
 
-    public void setLatitudZona(BigDecimal latitudZona) {
+    public void setLatitudZona(double latitudZona) {
         this.latitudZona = latitudZona;
     }
 
-    public BigDecimal getLongitudZona() {
+    public double getLongitudZona() {
         return longitudZona;
     }
 
-    public void setLongitudZona(BigDecimal longitudZona) {
+    public void setLongitudZona(double longitudZona) {
         this.longitudZona = longitudZona;
     }
 }
