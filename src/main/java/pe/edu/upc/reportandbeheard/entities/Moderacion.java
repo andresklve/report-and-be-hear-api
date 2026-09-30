@@ -1,22 +1,25 @@
 package pe.edu.upc.reportandbeheard.entities;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "moderaciones")
 public class Moderacion {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_moderacion")
-    private Integer idModeracion;
+    private Long idModeracion;
 
-    @Column(name = "id_testimonio", nullable = false)
-    private Integer idTestimonio;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_testimonio", nullable = false)
+    private Testimonio testimonio;
 
-    @Column(name = "id_usuario_admin", nullable = false)
-    private Integer idUsuarioAdmin;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_usuario_admin", nullable = false)
+    private Usuario usuarioAdmin;
 
     @Column(name = "accion", length = 20, nullable = false)
     private String accion;
@@ -24,37 +27,48 @@ public class Moderacion {
     @Column(name = "motivo", length = 255)
     private String motivo;
 
-    @Column(name = "costo")
-    private Double costo;
+    @Column(name = "costo", precision = 10, scale = 2)
+    private BigDecimal costo;
 
-    @Column(name = "fecha_accion")
-    private LocalDateTime fechaAccion;
+    @Column(name = "fecha_accion", nullable = false)
+    private LocalDateTime fechaAccion = LocalDateTime.now();
 
     public Moderacion() {
     }
 
-    public Integer getIdModeracion() {
+    public Moderacion(Long idModeracion, Testimonio testimonio, Usuario usuarioAdmin,
+                     String accion, String motivo, BigDecimal costo, LocalDateTime fechaAccion) {
+        this.idModeracion = idModeracion;
+        this.testimonio = testimonio;
+        this.usuarioAdmin = usuarioAdmin;
+        this.accion = accion;
+        this.motivo = motivo;
+        this.costo = costo;
+        this.fechaAccion = fechaAccion;
+    }
+
+    public Long getIdModeracion() {
         return idModeracion;
     }
 
-    public void setIdModeracion(Integer idModeracion) {
+    public void setIdModeracion(Long idModeracion) {
         this.idModeracion = idModeracion;
     }
 
-    public Integer getIdTestimonio() {
-        return idTestimonio;
+    public Testimonio getTestimonio() {
+        return testimonio;
     }
 
-    public void setIdTestimonio(Integer idTestimonio) {
-        this.idTestimonio = idTestimonio;
+    public void setTestimonio(Testimonio testimonio) {
+        this.testimonio = testimonio;
     }
 
-    public Integer getIdUsuarioAdmin() {
-        return idUsuarioAdmin;
+    public Usuario getUsuarioAdmin() {
+        return usuarioAdmin;
     }
 
-    public void setIdUsuarioAdmin(Integer idUsuarioAdmin) {
-        this.idUsuarioAdmin = idUsuarioAdmin;
+    public void setUsuarioAdmin(Usuario usuarioAdmin) {
+        this.usuarioAdmin = usuarioAdmin;
     }
 
     public String getAccion() {
@@ -73,11 +87,11 @@ public class Moderacion {
         this.motivo = motivo;
     }
 
-    public Double getCosto() {
+    public BigDecimal getCosto() {
         return costo;
     }
 
-    public void setCosto(Double costo) {
+    public void setCosto(BigDecimal costo) {
         this.costo = costo;
     }
 
