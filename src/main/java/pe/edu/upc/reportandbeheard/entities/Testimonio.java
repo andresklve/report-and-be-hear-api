@@ -25,8 +25,7 @@ public class Testimonio {
     @JoinColumn(name = "id_zona", nullable = false)
     private Zona zona;
 
-    @Lob
-    @Column(name = "descripcion_texto", nullable = false)
+    @Column(name = "descripcion_texto", columnDefinition = "TEXT", nullable = false)
     private String descripcionTexto;
 
     @Column(name = "foto_url", length = 500)
