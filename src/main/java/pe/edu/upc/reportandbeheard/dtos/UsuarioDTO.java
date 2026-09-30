@@ -1,43 +1,39 @@
-package pe.edu.upc.reportandbeheard.entities;
+package pe.edu.upc.reportandbeheard.dtos;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "usuarios")
-public class Usuario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UsuarioDTO {
     private Long idUsuario;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "idRol", nullable = false)
-    private Rol rol;
+    @NotNull(message = "El rol es obligatorio.")
+    private Long idRol;
 
-    @Column(name = "nombres", length = 100, nullable = false)
+    @NotBlank(message = "El nombre es obligatorio.")
     private String nombres;
 
-    @Column(name = "apellidos", length = 100, nullable = false)
+    @NotBlank(message = "Los apellidos son obligatorios.")
     private String apellidos;
 
-    @Column(name = "correo", length = 150, nullable = false, unique = true)
+    @NotBlank(message = "El correo es obligatorio.")
+    @Email(message = "El correo no tiene un formato válido.")
     private String correo;
 
-    @Column(name = "passwordHash", length = 255, nullable = false)
+    @NotBlank(message = "La contraseña es obligatoria.")
     private String passwordHash;
 
-    @Column(name = "fechaRegistro", nullable = false)
     private LocalDateTime fechaRegistro;
 
-    @Column(name = "activo", nullable = false)
+    @NotNull(message = "El estado activo es obligatorio.")
     private Boolean activo;
-
-    public Usuario() {}
 
     public Long getIdUsuario() { return idUsuario; }
     public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
-    public Rol getRol() { return rol; }
-    public void setRol(Rol rol) { this.rol = rol; }
+    public Long getIdRol() { return idRol; }
+    public void setIdRol(Long idRol) { this.idRol = idRol; }
     public String getNombres() { return nombres; }
     public void setNombres(String nombres) { this.nombres = nombres; }
     public String getApellidos() { return apellidos; }

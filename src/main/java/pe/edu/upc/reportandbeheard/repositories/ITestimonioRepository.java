@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pe.edu.upc.reportandbeheard.dtos.CategoriaReporteDTO;
 import pe.edu.upc.reportandbeheard.dtos.MapaCalorDTO;
+import pe.edu.upc.reportandbeheard.dtos.RankingZonaDTO;
 import pe.edu.upc.reportandbeheard.entities.Testimonio;
 
 import java.util.List;
@@ -26,4 +27,23 @@ public interface ITestimonioRepository extends JpaRepository<Testimonio, Long> {
             "GROUP BY c.idCategoria, c.nombreCategoria " +
             "ORDER BY COUNT(t) DESC")
     List<CategoriaReporteDTO> reportePorCategoria();
+
+
+    // US09: tendencia temporal por dia.
+    @Query(value = "SELECT to_char(fecha_creacion, 'YYYY-MM-DD') AS periodo, COUNT(*) AS total " +
+            "FROM testimonios GROUP BY periodo ORDER BY periodo", nativeQuery = true)
+    List<Object[]> contarPorDia();
+
+    // US09: tendencia temporal por mes.
+    @Query(value = "SELECT to_char(fecha_creacion, 'YYYY-MM') AS periodo, COUNT(*) AS total " +
+            "FROM testimonios GROUP BY periodo ORDER BY periodo", nativeQuery = true)
+    List<Object[]> contarPorMes();
+
+    // US10: ranking de zonas por cantidad de testimonios.
+    @Query("SELECT new pe.edu.upc.reportandbeheard.dtos.RankingZonaDTO(" +
+            "z.idZona, z.nombreZona, COUNT(t)) " +
+            "FROM Testimonio t JOIN t.zona z " +
+            "GROUP BY z.idZona, z.nombreZona " +
+            "ORDER BY COUNT(t) DESC")
+    List<RankingZonaDTO> rankingZonas();
 }

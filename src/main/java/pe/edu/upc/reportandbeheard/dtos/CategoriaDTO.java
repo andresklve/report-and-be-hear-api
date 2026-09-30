@@ -1,24 +1,18 @@
-package pe.edu.upc.reportandbeheard.entities;
+package pe.edu.upc.reportandbeheard.dtos;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Entity
-@Table(name = "categorias")
-public class Categoria {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class CategoriaDTO {
     private Long idCategoria;
 
-    @Column(name = "nombreCategoria", length = 50, nullable = false)
+    @NotBlank(message = "El nombre de la categoría es obligatorio.")
     private String nombreCategoria;
 
-    @Column(name = "descripcionCategoria", length = 255)
     private String descripcionCategoria;
 
-    @Column(name = "activo", nullable = false)
+    @NotNull(message = "El estado activo es obligatorio.")
     private Boolean activo;
-
-    public Categoria() {}
 
     public Long getIdCategoria() { return idCategoria; }
     public void setIdCategoria(Long idCategoria) { this.idCategoria = idCategoria; }
