@@ -28,6 +28,7 @@ public interface ITestimonioRepository extends JpaRepository<Testimonio, Long> {
             "ORDER BY COUNT(t) DESC")
     List<CategoriaReporteDTO> reportePorCategoria();
 
+
     // US09: tendencia temporal por dia.
     @Query(value = "SELECT to_char(fecha_creacion, 'YYYY-MM-DD') AS periodo, COUNT(*) AS total " +
             "FROM testimonios GROUP BY periodo ORDER BY periodo", nativeQuery = true)

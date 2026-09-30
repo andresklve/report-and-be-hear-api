@@ -1,53 +1,37 @@
 package pe.edu.upc.reportandbeheard.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 
-public class TestimonioDTO {
+public class TestimonioResponseDTO {
+    @Schema(description = "Identificador del testimonio", example = "1")
     private Long idTestimonio;
 
-    @NotNull(message = "El id del usuario es obligatorio.")
-    @Schema(description = "Identificador del usuario que registra el testimonio", example = "1")
+    @Schema(description = "Identificador del usuario", example = "10")
     private Long idUsuario;
 
-    @NotNull(message = "El id de la categoría es obligatorio.")
-    @Schema(description = "Identificador de la categoría del testimonio", example = "2")
+    @Schema(description = "Identificador de la categoría", example = "2")
     private Long idCategoria;
 
-    @NotNull(message = "El id de la zona es obligatorio.")
-    @Schema(description = "Identificador de la zona del testimonio", example = "3")
+    @Schema(description = "Identificador de la zona", example = "3")
     private Long idZona;
 
-    @NotBlank(message = "La descripción del testimonio es obligatoria.")
-    @Size(max = 5000, message = "La descripción no puede exceder 5000 caracteres.")
-    @Schema(description = "Texto del testimonio", example = "Gracias a la atención oportuna del equipo, mi caso fue resuelto de manera rápida y clara.")
+    @Schema(description = "Texto del testimonio", example = "El servicio recibido fue excelente y oportuno.")
     private String descripcionTexto;
 
-    @Schema(description = "URL de la foto adjunta al testimonio", example = "https://example.com/foto.jpg")
+    @Schema(description = "URL de la foto adjunta", example = "https://example.com/foto.jpg")
     private String fotoUrl;
 
-    @Schema(description = "Dirección extraída del texto del testimonio", example = "Av. Brasil 123, Lima")
+    @Schema(description = "Dirección extraída del texto", example = "Jr. Lima 120, Arequipa")
     private String direccionTextoExtraida;
 
-    @NotNull(message = "La latitud es obligatoria.")
-    @DecimalMin(value = "-90.0", message = "La latitud debe estar entre -90 y 90.")
-    @DecimalMax(value = "90.0", message = "La latitud debe estar entre -90 y 90.")
-    @Schema(description = "Latitud geográfica del testimonio", example = "-12.046374")
+    @Schema(description = "Latitud geográfica", example = "-16.409047")
     private BigDecimal latitud;
 
-    @NotNull(message = "La longitud es obligatoria.")
-    @DecimalMin(value = "-180.0", message = "La longitud debe estar entre -180 y 180.")
-    @DecimalMax(value = "180.0", message = "La longitud debe estar entre -180 y 180.")
-    @Schema(description = "Longitud geográfica del testimonio", example = "-77.042793")
+    @Schema(description = "Longitud geográfica", example = "-71.537451")
     private BigDecimal longitud;
 
-    @NotBlank(message = "El estado del testimonio es obligatorio.")
     @Schema(description = "Estado del testimonio", example = "PENDIENTE")
     private String estado;
 
