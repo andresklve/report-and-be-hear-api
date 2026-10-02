@@ -44,7 +44,7 @@ public class Testimonio {
     @Column(name = "estado", length = 20)
     private String estado;
 
-    @Column(name = "confianza_ia", precision = 5, scale = 4)
+    @Column(name = "confianza_ia")
     private Double confianzaIA;
 
     @Column(name = "modelo_ia", length = 50)
