@@ -36,4 +36,12 @@ public interface IModeracionRepository extends JpaRepository<Moderacion, Long> {
             ORDER BY c.nombreCategoria
             """)
     List<CostoCategoriaDTO> obtenerCostoPorCategoria();
+
+    // US13: promedio de dias entre fecha_creacion del testimonio y fecha_accion de la moderacion.
+    // NULLIF evita la division entre cero (sin moderaciones devuelve NULL).
+    @Query(value = "SELECT CAST(SUM(EXTRACT(EPOCH FROM (m.fecha_accion - t.fecha_creacion)) / 86400) " +
+            "/ NULLIF(COUNT(*), 0) AS double precision) " +
+            "FROM moderaciones m JOIN testimonios t ON m.id_testimonio = t.id_testimonio",
+            nativeQuery = true)
+    Double obtenerTiempoPromedioAtencion();
 }

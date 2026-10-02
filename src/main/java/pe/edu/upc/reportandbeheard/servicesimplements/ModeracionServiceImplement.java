@@ -3,6 +3,7 @@ package pe.edu.upc.reportandbeheard.servicesimplements;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.reportandbeheard.dtos.InversionDepartamentoDTO;
 import pe.edu.upc.reportandbeheard.dtos.CostoCategoriaDTO;
+import pe.edu.upc.reportandbeheard.dtos.TiempoAtencionDTO;
 import pe.edu.upc.reportandbeheard.entities.Moderacion;
 import pe.edu.upc.reportandbeheard.repositories.IModeracionRepository;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IModeracionService;
@@ -44,6 +45,12 @@ public class ModeracionServiceImplement implements IModeracionService {
                                 : reporte.getTotalCosto()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public TiempoAtencionDTO obtenerTiempoPromedioAtencion() {
+        Double dias = moderacionRepository.obtenerTiempoPromedioAtencion();
+        return new TiempoAtencionDTO(dias == null ? 0.0 : dias);
     }
 
     @Override

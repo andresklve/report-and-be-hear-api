@@ -44,6 +44,12 @@ public class Testimonio {
     @Column(name = "estado", length = 20)
     private String estado;
 
+    @Column(name = "confianza_ia", precision = 5, scale = 4)
+    private Double confianzaIA;
+
+    @Column(name = "modelo_ia", length = 50)
+    private String modeloIA;
+
     @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
@@ -149,6 +155,22 @@ public class Testimonio {
 
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+
+    public Double getConfianzaIA() {
+        return confianzaIA;
+    }
+
+    public void setConfianzaIA(Double confianzaIA) {
+        this.confianzaIA = confianzaIA;
+    }
+
+    public String getModeloIA() {
+        return modeloIA;
+    }
+
+    public void setModeloIA(String modeloIA) {
+        this.modeloIA = modeloIA;
     }
 
     public LocalDateTime getFechaCreacion() {
