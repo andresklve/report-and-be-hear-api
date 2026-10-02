@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pe.edu.upc.reportandbeheard.dtos.CategoriaReporteDTO;
 import pe.edu.upc.reportandbeheard.dtos.CostoCategoriaDTO;
+import pe.edu.upc.reportandbeheard.dtos.DesempenoIADTO;
 import pe.edu.upc.reportandbeheard.dtos.InversionDepartamentoDTO;
 import pe.edu.upc.reportandbeheard.dtos.MapaCalorDTO;
 import pe.edu.upc.reportandbeheard.dtos.RankingZonaDTO;
 import pe.edu.upc.reportandbeheard.dtos.TendenciaTemporalDTO;
+import pe.edu.upc.reportandbeheard.dtos.TiempoAtencionDTO;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IModeracionService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.IReporteService;
 
@@ -77,5 +79,17 @@ public class ReporteController {
     @GetMapping("/ranking-zonas")
     public ResponseEntity<List<RankingZonaDTO>> rankingZonas() {
         return ResponseEntity.ok(rS.rankingZonas());
+    }
+
+    // US13: sin moderaciones devuelve diasPromedio 0 con 200.
+    @GetMapping("/tiempo-atencion")
+    public ResponseEntity<TiempoAtencionDTO> tiempoAtencion() {
+        return ResponseEntity.ok(moderacionService.obtenerTiempoPromedioAtencion());
+    }
+
+    // US14: sin confianza de IA registrada devuelve lista vacia con 200.
+    @GetMapping("/desempeno-ia")
+    public ResponseEntity<List<DesempenoIADTO>> desempenoIA() {
+        return ResponseEntity.ok(rS.desempenoIA());
     }
 }

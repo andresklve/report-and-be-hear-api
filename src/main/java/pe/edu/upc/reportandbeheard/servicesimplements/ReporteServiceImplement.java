@@ -2,6 +2,7 @@ package pe.edu.upc.reportandbeheard.servicesimplements;
 
 import org.springframework.stereotype.Service;
 import pe.edu.upc.reportandbeheard.dtos.CategoriaReporteDTO;
+import pe.edu.upc.reportandbeheard.dtos.DesempenoIADTO;
 import pe.edu.upc.reportandbeheard.dtos.MapaCalorDTO;
 import pe.edu.upc.reportandbeheard.dtos.RankingZonaDTO;
 import pe.edu.upc.reportandbeheard.dtos.TendenciaTemporalDTO;
@@ -44,5 +45,10 @@ public class ReporteServiceImplement implements IReporteService {
     @Override
     public List<RankingZonaDTO> rankingZonas() {
         return tR.rankingZonas();
+    }
+
+    @Override
+    public List<DesempenoIADTO> desempenoIA() {
+        return tR.desempenoIA();
     }
 }

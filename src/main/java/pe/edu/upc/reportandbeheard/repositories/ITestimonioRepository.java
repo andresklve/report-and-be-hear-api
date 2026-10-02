@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import pe.edu.upc.reportandbeheard.dtos.CategoriaReporteDTO;
+import pe.edu.upc.reportandbeheard.dtos.DesempenoIADTO;
 import pe.edu.upc.reportandbeheard.dtos.MapaCalorDTO;
 import pe.edu.upc.reportandbeheard.dtos.RankingZonaDTO;
 import pe.edu.upc.reportandbeheard.entities.Testimonio;
@@ -46,4 +47,13 @@ public interface ITestimonioRepository extends JpaRepository<Testimonio, Long> {
             "GROUP BY z.idZona, z.nombreZona " +
             "ORDER BY COUNT(t) DESC")
     List<RankingZonaDTO> rankingZonas();
+
+    // US14: promedio de confianza de la IA por categoria y modelo (JOIN testimonios-categorias).
+    @Query("SELECT new pe.edu.upc.reportandbeheard.dtos.DesempenoIADTO(" +
+            "c.nombreCategoria, t.modeloIA, AVG(t.confianzaIA)) " +
+            "FROM Testimonio t JOIN t.categoria c " +
+            "WHERE t.confianzaIA IS NOT NULL " +
+            "GROUP BY c.nombreCategoria, t.modeloIA " +
+            "ORDER BY c.nombreCategoria")
+    List<DesempenoIADTO> desempenoIA();
 }

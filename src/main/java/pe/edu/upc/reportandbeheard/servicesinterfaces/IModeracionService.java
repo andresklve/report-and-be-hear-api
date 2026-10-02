@@ -2,6 +2,7 @@ package pe.edu.upc.reportandbeheard.servicesinterfaces;
 
 import pe.edu.upc.reportandbeheard.dtos.InversionDepartamentoDTO;
 import pe.edu.upc.reportandbeheard.dtos.CostoCategoriaDTO;
+import pe.edu.upc.reportandbeheard.dtos.TiempoAtencionDTO;
 import pe.edu.upc.reportandbeheard.entities.Moderacion;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public interface IModeracionService {
     // Reportes
     List<InversionDepartamentoDTO> obtenerInversionPorDepartamento();
     List<CostoCategoriaDTO> obtenerCostoPorCategoria();
+    TiempoAtencionDTO obtenerTiempoPromedioAtencion();
 
     // CRUD (US06)
     void insert(Moderacion moderacion);
