@@ -19,31 +19,30 @@ import pe.edu.upc.reportandbeheard.entities.Testimonio;
 import pe.edu.upc.reportandbeheard.entities.Usuario;
 import pe.edu.upc.reportandbeheard.entities.Zona;
 import pe.edu.upc.reportandbeheard.exceptions.ResourceNotFoundException;
-import pe.edu.upc.reportandbeheard.repositories.ICategoriaRepository;
-import pe.edu.upc.reportandbeheard.repositories.IUsuarioRepository;
-import pe.edu.upc.reportandbeheard.repositories.IZonaRepository;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.ICategoriaService;
 import pe.edu.upc.reportandbeheard.servicesinterfaces.ITestimonioService;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.IUsuarioService;
+import pe.edu.upc.reportandbeheard.servicesinterfaces.IZonaService;
 
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/apis/testimonios")
 public class TestimonioController {
     private final ITestimonioService tS;
-    private final IUsuarioRepository uR;
-    private final ICategoriaRepository cR;
-    private final IZonaRepository zR;
+    private final IUsuarioService uS;
+    private final ICategoriaService cS;
+    private final IZonaService zS;
     private final ModelMapper modelMapper;
 
-    public TestimonioController(ITestimonioService tS, IUsuarioRepository uR,
-                               ICategoriaRepository cR, IZonaRepository zR, ModelMapper modelMapper) {
+    public TestimonioController(ITestimonioService tS, IUsuarioService uS,
+                               ICategoriaService cS, IZonaService zS, ModelMapper modelMapper) {
         this.tS = tS;
-        this.uR = uR;
-        this.cR = cR;
-        this.zR = zR;
+        this.uS = uS;
+        this.cS = cS;
+        this.zS = zS;
         this.modelMapper = modelMapper;
     }
 
@@ -55,11 +54,11 @@ public class TestimonioController {
     })
     @PostMapping
     public ResponseEntity<TestimonioDTO> registrar(@Valid @RequestBody TestimonioDTO dto) {
-        Usuario usuario = uR.findById(dto.getIdUsuario())
+        Usuario usuario = uS.listId(dto.getIdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe un usuario con el id: " + dto.getIdUsuario()));
-        Categoria categoria = cR.findById(dto.getIdCategoria())
+        Categoria categoria = cS.listId(dto.getIdCategoria())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una categoría con el id: " + dto.getIdCategoria()));
-        Zona zona = zR.findById(dto.getIdZona())
+        Zona zona = zS.listId(dto.getIdZona())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una zona con el id: " + dto.getIdZona()));
 
         Testimonio testimonio = new Testimonio();
@@ -119,7 +118,7 @@ public class TestimonioController {
     public ResponseEntity<TestimonioResponseDTO> buscarPorId(
             @Parameter(description = "Identificador del testimonio", required = true)
             @PathVariable Long id) {
-        Testimonio testimonio = tS.obtenerPorId(id)
+        Testimonio testimonio = tS.listId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No existe un testimonio con el id: " + id));
 
         TestimonioResponseDTO dto = modelMapper.map(testimonio, TestimonioResponseDTO.class);
@@ -133,17 +132,13 @@ public class TestimonioController {
     public ResponseEntity<TestimonioResponseDTO> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody TestimonioUpdateRequest dto) {
-        Optional<Testimonio> existente = tS.obtenerPorId(id);
-        if (existente.isEmpty()) {
-            throw new ResourceNotFoundException("No existe un testimonio con el id: " + id);
-        }
-
-        Testimonio testimonio = existente.get();
-        Usuario usuario = uR.findById(dto.getIdUsuario())
+        Testimonio testimonio = tS.listId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe un testimonio con el id: " + id));
+        Usuario usuario = uS.listId(dto.getIdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe un usuario con el id: " + dto.getIdUsuario()));
-        Categoria categoria = cR.findById(dto.getIdCategoria())
+        Categoria categoria = cS.listId(dto.getIdCategoria())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una categoría con el id: " + dto.getIdCategoria()));
-        Zona zona = zR.findById(dto.getIdZona())
+        Zona zona = zS.listId(dto.getIdZona())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una zona con el id: " + dto.getIdZona()));
 
         testimonio.setUsuario(usuario);
@@ -157,7 +152,7 @@ public class TestimonioController {
         testimonio.setEstado(dto.getEstado());
         testimonio.setFechaActualizacion(LocalDateTime.now());
 
-        tS.actualizar(testimonio);
+        tS.update(testimonio);
 
         TestimonioResponseDTO response = modelMapper.map(testimonio, TestimonioResponseDTO.class);
         response.setIdUsuario(usuario.getIdUsuario());
@@ -168,7 +163,9 @@ public class TestimonioController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
-        tS.eliminar(id);
+        Testimonio testimonio = tS.listId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe un testimonio con el id: " + id));
+        tS.delete(testimonio.getIdTestimonio());
         return ResponseEntity.noContent().build();
     }
 }

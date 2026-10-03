@@ -117,7 +117,7 @@ public class ModeracionController {
     }
 
     private Testimonio buscarTestimonio(Long idTestimonio) {
-        return tS.obtenerPorId(idTestimonio)
+        return tS.listId(idTestimonio)
                 .orElseThrow(() ->
                         new ResourceNotFoundException("No existe un testimonio con el id: " + idTestimonio)
                 );
