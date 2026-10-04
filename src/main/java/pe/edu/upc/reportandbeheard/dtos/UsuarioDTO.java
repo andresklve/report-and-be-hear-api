@@ -2,14 +2,12 @@ package pe.edu.upc.reportandbeheard.dtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 
 public class UsuarioDTO {
     private Long idUsuario;
 
-    @NotNull(message = "El rol es obligatorio.")
     private Long idRol;
 
     @NotBlank(message = "El nombre es obligatorio.")
@@ -27,7 +25,6 @@ public class UsuarioDTO {
 
     private LocalDateTime fechaRegistro;
 
-    @NotNull(message = "El estado activo es obligatorio.")
     private Boolean activo;
 
     public Long getIdUsuario() { return idUsuario; }
