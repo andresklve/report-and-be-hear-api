@@ -2,6 +2,7 @@ package pe.edu.upc.reportandbeheard.controllers;
 
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.ModeracionDTO;
@@ -31,6 +32,7 @@ public class ModeracionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'MUNICIPALIDAD')")
     public ResponseEntity<List<ModeracionDTO>> listar() {
         List<ModeracionDTO> lista = mS.list()
                 .stream()
@@ -41,6 +43,7 @@ public class ModeracionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'MUNICIPALIDAD')")
     public ResponseEntity<ModeracionDTO> registrar(@Valid @RequestBody ModeracionDTO dto) {
         Testimonio testimonio = buscarTestimonio(dto.getIdTestimonio());
         Usuario usuarioAdmin = buscarUsuario(dto.getIdUsuarioAdmin());
@@ -69,6 +72,7 @@ public class ModeracionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'MUNICIPALIDAD')")
     public ResponseEntity<ModeracionDTO> buscarPorId(@PathVariable Long id) {
         Moderacion moderacion = mS.listId(id)
                 .orElseThrow(() ->
@@ -79,6 +83,7 @@ public class ModeracionController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'MUNICIPALIDAD')")
     public ResponseEntity<ModeracionDTO> actualizar(@Valid @RequestBody ModeracionDTO dto) {
         if (dto.getIdModeracion() == null) {
             throw new ResourceNotFoundException("Debe indicar el id de la moderación a actualizar.");
@@ -106,6 +111,7 @@ public class ModeracionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'MUNICIPALIDAD')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Moderacion moderacion = mS.listId(id)
                 .orElseThrow(() ->

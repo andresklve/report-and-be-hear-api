@@ -3,6 +3,9 @@ package pe.edu.upc.reportandbeheard.controllers;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.UsuarioDTO;
@@ -31,6 +34,7 @@ public class UsuarioController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<List<UsuarioDTO>> listar() {
         List<UsuarioDTO> lista = uS.list()
                 .stream()
@@ -46,12 +50,26 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> registrar(@Valid @RequestBody UsuarioDTO dto) {
-        Rol rol = rS.listId(dto.getIdRol())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("No existe un rol con el id: " + dto.getIdRol())
-                );
+        // El registro es publico: solo un ADMINISTRADOR autenticado elige el rol,
+        // para cualquier otro caso el rol se fuerza a CIUDADANO e idRol se ignora.
+        Rol rol;
+        if (esAdministrador()) {
+            rol = rS.listId(dto.getIdRol())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("No existe un rol con el id: " + dto.getIdRol())
+                    );
+        } else {
+            rol = rS.list()
+                    .stream()
+                    .filter(r -> "CIUDADANO".equals(r.getNombreRol()))
+                    .findFirst()
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("No existe el rol CIUDADANO")
+                    );
+        }
 
         Usuario usuario = modelMapper.map(dto, Usuario.class);
+        usuario.setIdUsuario(null); // un registro siempre crea; nunca pisa un usuario existente
         usuario.setRol(rol);
         usuario.setFechaRegistro(LocalDateTime.now());
 
@@ -72,6 +90,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<UsuarioDTO> buscarPorId(@PathVariable Long id) {
         Usuario usuario = uS.listId(id)
                 .orElseThrow(() ->
@@ -84,6 +103,7 @@ public class UsuarioController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<UsuarioDTO> actualizar(@Valid @RequestBody UsuarioDTO dto) {
         Usuario existente = uS.listId(dto.getIdUsuario())
                 .orElseThrow(() ->
@@ -110,6 +130,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Usuario usuario = uS.listId(id)
                 .orElseThrow(() ->
@@ -118,5 +139,12 @@ public class UsuarioController {
 
         uS.delete(usuario.getIdUsuario());
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean esAdministrador() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null && authentication.getAuthorities()
+                .stream()
+                .anyMatch(a -> "ADMINISTRADOR".equals(a.getAuthority()));
     }
 }

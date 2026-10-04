@@ -3,6 +3,7 @@ package pe.edu.upc.reportandbeheard.controllers;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.CategoriaDTO;
@@ -25,6 +26,7 @@ public class CategoriaController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CIUDADANO', 'MUNICIPALIDAD')")
     public ResponseEntity<List<CategoriaDTO>> listar() {
         return ResponseEntity.ok(cS.list()
                 .stream()
@@ -33,6 +35,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CIUDADANO', 'MUNICIPALIDAD')")
     public ResponseEntity<CategoriaDTO> buscarPorId(@PathVariable Long id) {
         Categoria categoria = cS.listId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una categoría con el id: " + id));
@@ -40,6 +43,7 @@ public class CategoriaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<CategoriaDTO> registrar(@Valid @RequestBody CategoriaDTO dto) {
         Categoria categoria = modelMapper.map(dto, Categoria.class);
         cS.insert(categoria);
@@ -52,6 +56,7 @@ public class CategoriaController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<CategoriaDTO> actualizar(@Valid @RequestBody CategoriaDTO dto) {
         Categoria categoria = cS.listId(dto.getIdCategoria())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una categoría con el id: " + dto.getIdCategoria()));
@@ -63,6 +68,7 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Categoria categoria = cS.listId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No existe una categoría con el id: " + id));

@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.TestimonioDTO;
@@ -53,6 +54,7 @@ public class TestimonioController {
             @ApiResponse(responseCode = "404", description = "Usuario, categoría o zona no encontrados")
     })
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CIUDADANO')")
     public ResponseEntity<TestimonioDTO> registrar(@Valid @RequestBody TestimonioDTO dto) {
         Usuario usuario = uS.listId(dto.getIdUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("No existe un usuario con el id: " + dto.getIdUsuario()));
@@ -94,6 +96,7 @@ public class TestimonioController {
             @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = TestimonioResponseDTO.class)))
     })
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CIUDADANO', 'MUNICIPALIDAD')")
     public ResponseEntity<List<TestimonioResponseDTO>> listar() {
         List<TestimonioResponseDTO> lista = tS.list()
                 .stream()
@@ -115,6 +118,7 @@ public class TestimonioController {
             @ApiResponse(responseCode = "404", description = "Testimonio no encontrado")
     })
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CIUDADANO', 'MUNICIPALIDAD')")
     public ResponseEntity<TestimonioResponseDTO> buscarPorId(
             @Parameter(description = "Identificador del testimonio", required = true)
             @PathVariable Long id) {
@@ -129,6 +133,7 @@ public class TestimonioController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<TestimonioResponseDTO> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody TestimonioUpdateRequest dto) {
@@ -162,6 +167,7 @@ public class TestimonioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Testimonio testimonio = tS.listId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No existe un testimonio con el id: " + id));

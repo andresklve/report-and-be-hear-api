@@ -3,6 +3,7 @@ package pe.edu.upc.reportandbeheard.controllers;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.RolDTO;
@@ -26,6 +27,7 @@ public class RolController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<List<RolDTO>> listar() {
         List<RolDTO> lista = rS.list()
                 .stream()
@@ -36,6 +38,7 @@ public class RolController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<RolDTO> registrar(@Valid @RequestBody RolDTO dto) {
         Rol rol = modelMapper.map(dto, Rol.class);
         rS.insert(rol);
@@ -54,6 +57,7 @@ public class RolController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<RolDTO> buscarPorId(@PathVariable Long id) {
         Rol rol = rS.listId(id)
                 .orElseThrow(() ->
@@ -65,6 +69,7 @@ public class RolController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<RolDTO> actualizar(@Valid @RequestBody RolDTO dto) {
         Optional<Rol> existente = rS.listId(dto.getIdRol());
 
@@ -83,6 +88,7 @@ public class RolController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Rol rol = rS.listId(id)
                 .orElseThrow(() ->

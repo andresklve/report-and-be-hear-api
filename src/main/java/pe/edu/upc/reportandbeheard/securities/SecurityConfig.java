@@ -68,6 +68,9 @@ public class SecurityConfig {
                         // Login publico
                         .requestMatchers("/login").permitAll()
 
+                        // Registro publico de usuarios
+                        .requestMatchers(HttpMethod.POST, "/apis/usuarios").permitAll()
+
                         // Swagger
                         .requestMatchers(
                                 "/swagger-ui/**",

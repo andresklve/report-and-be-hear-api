@@ -3,6 +3,7 @@ package pe.edu.upc.reportandbeheard.controllers;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.ZonaDTO;
@@ -26,6 +27,7 @@ public class ZonaController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CIUDADANO', 'MUNICIPALIDAD')")
     public ResponseEntity<List<ZonaDTO>> listar() {
         List<ZonaDTO> lista = zS.list()
                 .stream()
@@ -36,6 +38,7 @@ public class ZonaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<ZonaDTO> registrar(@Valid @RequestBody ZonaDTO dto) {
         Zona zona = modelMapper.map(dto, Zona.class);
         zS.insert(zona);
@@ -54,6 +57,7 @@ public class ZonaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'CIUDADANO', 'MUNICIPALIDAD')")
     public ResponseEntity<ZonaDTO> buscarPorId(@PathVariable Long id) {
         Zona zona = zS.listId(id)
                 .orElseThrow(() ->
@@ -65,6 +69,7 @@ public class ZonaController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<ZonaDTO> actualizar(@Valid @RequestBody ZonaDTO dto) {
         Optional<Zona> existente = zS.listId(dto.getIdZona());
 
@@ -86,6 +91,7 @@ public class ZonaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         Zona zona = zS.listId(id)
                 .orElseThrow(() ->
