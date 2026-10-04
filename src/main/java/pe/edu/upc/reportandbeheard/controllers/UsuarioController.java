@@ -55,10 +55,11 @@ public class UsuarioController {
 
     @PostMapping
     public ResponseEntity<UsuarioDTO> registrar(@Valid @RequestBody UsuarioDTO dto) {
-        // El registro es publico: solo un ADMINISTRADOR autenticado elige el rol,
-        // para cualquier otro caso el rol se fuerza a CIUDADANO e idRol se ignora.
+        // El registro es publico: solo un ADMINISTRADOR autenticado elige rol y estado,
+        // para cualquier otro caso el rol es CIUDADANO, activo es true e idRol se ignora.
+        boolean esAdmin = esAdministrador();
         Rol rol;
-        if (esAdministrador()) {
+        if (esAdmin && dto.getIdRol() != null) {
             rol = rS.listId(dto.getIdRol())
                     .orElseThrow(() ->
                             new ResourceNotFoundException("No existe un rol con el id: " + dto.getIdRol())
@@ -69,13 +70,14 @@ public class UsuarioController {
                     .filter(r -> "CIUDADANO".equals(r.getNombreRol()))
                     .findFirst()
                     .orElseThrow(() ->
-                            new ResourceNotFoundException("No existe el rol CIUDADANO")
+                            new ResourceNotFoundException("No existe el rol CIUDADANO en la base de datos")
                     );
         }
 
         Usuario usuario = modelMapper.map(dto, Usuario.class);
         usuario.setIdUsuario(null); // un registro siempre crea; nunca pisa un usuario existente
         usuario.setRol(rol);
+        usuario.setActivo(esAdmin && dto.getActivo() != null ? dto.getActivo() : Boolean.TRUE);
         usuario.setPasswordHash(passwordEncoder.encode(dto.getPasswordHash()));
         usuario.setFechaRegistro(LocalDateTime.now());
 
@@ -118,12 +120,13 @@ public class UsuarioController {
                         new ResourceNotFoundException("No existe un usuario con el id: " + dto.getIdUsuario())
                 );
 
-        Rol rol = rS.listId(dto.getIdRol())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("No existe un rol con el id: " + dto.getIdRol())
-                );
-
-        existente.setRol(rol);
+        if (dto.getIdRol() != null) {
+            Rol rol = rS.listId(dto.getIdRol())
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("No existe un rol con el id: " + dto.getIdRol())
+                    );
+            existente.setRol(rol);
+        }
         existente.setNombres(dto.getNombres());
         existente.setApellidos(dto.getApellidos());
         existente.setCorreo(dto.getCorreo());
@@ -135,7 +138,9 @@ public class UsuarioController {
         } else {
             existente.setPasswordHash(passwordEncoder.encode(nuevaPassword));
         }
-        existente.setActivo(dto.getActivo());
+        if (dto.getActivo() != null) {
+            existente.setActivo(dto.getActivo());
+        }
 
         uS.update(existente);
 
