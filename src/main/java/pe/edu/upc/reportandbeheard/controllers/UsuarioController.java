@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.reportandbeheard.dtos.UsuarioDTO;
@@ -26,11 +27,14 @@ public class UsuarioController {
     private final IUsuarioService uS;
     private final IRolService rS;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(IUsuarioService uS, IRolService rS, ModelMapper modelMapper) {
+    public UsuarioController(IUsuarioService uS, IRolService rS, ModelMapper modelMapper,
+                             PasswordEncoder passwordEncoder) {
         this.uS = uS;
         this.rS = rS;
         this.modelMapper = modelMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping
@@ -41,6 +45,7 @@ public class UsuarioController {
                 .map(u -> {
                     UsuarioDTO dto = modelMapper.map(u, UsuarioDTO.class);
                     dto.setIdRol(u.getRol().getIdRol());
+                    dto.setPasswordHash(null);
                     return dto;
                 })
                 .toList();
@@ -71,12 +76,14 @@ public class UsuarioController {
         Usuario usuario = modelMapper.map(dto, Usuario.class);
         usuario.setIdUsuario(null); // un registro siempre crea; nunca pisa un usuario existente
         usuario.setRol(rol);
+        usuario.setPasswordHash(passwordEncoder.encode(dto.getPasswordHash()));
         usuario.setFechaRegistro(LocalDateTime.now());
 
         uS.insert(usuario);
 
         UsuarioDTO responseDTO = modelMapper.map(usuario, UsuarioDTO.class);
         responseDTO.setIdRol(usuario.getRol().getIdRol());
+        responseDTO.setPasswordHash(null);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -99,6 +106,7 @@ public class UsuarioController {
 
         UsuarioDTO dto = modelMapper.map(usuario, UsuarioDTO.class);
         dto.setIdRol(usuario.getRol().getIdRol());
+        dto.setPasswordHash(null);
         return ResponseEntity.ok(dto);
     }
 
@@ -119,13 +127,21 @@ public class UsuarioController {
         existente.setNombres(dto.getNombres());
         existente.setApellidos(dto.getApellidos());
         existente.setCorreo(dto.getCorreo());
-        existente.setPasswordHash(dto.getPasswordHash());
+        String nuevaPassword = dto.getPasswordHash();
+        if (nuevaPassword == null || nuevaPassword.isBlank()) {
+            // sin contrasena nueva: se conserva el hash que ya tiene el usuario
+        } else if (esHashBCrypt(nuevaPassword)) {
+            existente.setPasswordHash(nuevaPassword);
+        } else {
+            existente.setPasswordHash(passwordEncoder.encode(nuevaPassword));
+        }
         existente.setActivo(dto.getActivo());
 
         uS.update(existente);
 
         UsuarioDTO responseDTO = modelMapper.map(existente, UsuarioDTO.class);
         responseDTO.setIdRol(existente.getRol().getIdRol());
+        responseDTO.setPasswordHash(null);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -139,6 +155,10 @@ public class UsuarioController {
 
         uS.delete(usuario.getIdUsuario());
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean esHashBCrypt(String valor) {
+        return valor.startsWith("$2a$") || valor.startsWith("$2b$") || valor.startsWith("$2y$");
     }
 
     private boolean esAdministrador() {
